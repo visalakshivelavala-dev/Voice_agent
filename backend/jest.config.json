@@ -1,0 +1,6 @@
+{
+  "testEnvironment": "node",
+  "transform": {},
+  "moduleDirectories": ["node_modules", "<rootDir>/node_modules"],
+  "modulePaths": ["<rootDir>/node_modules"]
+}

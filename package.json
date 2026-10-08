@@ -1,0 +1,15 @@
+{
+  "name": "medvoice-ai",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "test": "npm --prefix backend run test",
+    "build:frontend": "npm --prefix frontend run build",
+    "setup:retell": "node voice-agent/setupRetellAgent.js",
+    "seed:supabase": "node database/seedSupabase.js"
+  }
+}

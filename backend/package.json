@@ -1,0 +1,26 @@
+{
+  "name": "medvoice-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MedVoice AI - Backend API and Retell AI Voice Agent Service",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.json --runInBand",
+    "setup:retell": "node ../voice-agent/setupRetellAgent.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "retell-sdk": "^4.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}
