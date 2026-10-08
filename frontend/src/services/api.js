@@ -9,7 +9,14 @@ const STORAGE_CUSTOM_BACKEND = 'medvoice_custom_backend_url';
 
 export function getCustomBackendUrl() {
   try {
-    return localStorage.getItem(STORAGE_CUSTOM_BACKEND) || '';
+    const stored = localStorage.getItem(STORAGE_CUSTOM_BACKEND);
+    if (!stored) return '';
+    // Discard legacy invalid placeholder strings
+    if (stored.includes('your-medvoice-backend') || stored.includes('example.com')) {
+      localStorage.removeItem(STORAGE_CUSTOM_BACKEND);
+      return '';
+    }
+    return stored.trim();
   } catch {
     return '';
   }
@@ -25,15 +32,21 @@ export function setCustomBackendUrl(url) {
   } catch {}
 }
 
+const normalizeApiUrl = (url) => {
+  if (!url) return '';
+  const clean = url.trim().replace(/\/+$/, '');
+  return clean.endsWith('/api') ? clean : `${clean}/api`;
+};
+
 export function getApiBase() {
   const custom = getCustomBackendUrl();
-  if (custom) return `${custom}/api`;
+  if (custom) return normalizeApiUrl(custom);
 
   if (import.meta.env.VITE_API_URL) {
-    return `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/api`;
+    return normalizeApiUrl(import.meta.env.VITE_API_URL);
   }
   if (import.meta.env.VITE_BACKEND_URL) {
-    return `${import.meta.env.VITE_BACKEND_URL.replace(/\/+$/, '')}/api`;
+    return normalizeApiUrl(import.meta.env.VITE_BACKEND_URL);
   }
   return '/api';
 }

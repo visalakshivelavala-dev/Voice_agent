@@ -21,21 +21,59 @@ dotenv.config();
 
 const app = express();
 
-// Security & Middlewares
+// Security Headers
 app.use(helmet({
   crossOriginResourcePolicy: false,
 }));
+
+// CORS Configuration - Allows production Vercel frontend, preview branches, and local dev
+const allowedOrigins = [
+  'https://voice-agent-vink4.vercel.app',
+  'https://voice-agent-tcqo.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5000',
+];
+
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL.replace(/\/+$/, ''));
+}
+
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    // Allow non-browser requests (e.g. curl, Retell webhooks, health checks)
+    if (!origin) return callback(null, true);
+
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.vercel.app') ||
+      process.env.NODE_ENV !== 'production'
+    ) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
+
+// Root Health Check Endpoint (Required by Render & uptime monitors)
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: 'MedVoice AI Backend',
+  });
+});
 
 // Route Mounts
 app.use('/api', seedRouter);
